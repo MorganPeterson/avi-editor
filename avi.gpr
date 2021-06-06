@@ -1,0 +1,78 @@
+project Avi is
+    for Languages use ("ada");
+    for Source_Dirs use ("src");
+    for Object_Dir use "obj";
+    for Create_Missing_Dirs use "True";
+    for Main use ("main.adb");
+
+    type Enabled_Kind is ("enabled", "disabled");
+    Compile_Checks : Enabled_Kind := external ("AVI_COMPILE_CHECKS", "enabled");
+    Runtime_Checks : Enabled_Kind := External ("AVI_RUNTIME_CHECKS", "enabled");
+    Style_Checks : Enabled_Kind := External ("AVI_STYLE_CHECKS", "enabled");
+    Contracts_Checks : Enabled_Kind := External ("AVI_CONTRACTS", "enabled");
+
+    type Build_Kind is ("debug", "optimize");
+    Build_Mode : Build_Kind := External ("AVI_BUILD_MODE", "debug");
+
+    Compile_Check_Switches := ();
+    case Compile_Checks is
+        when "enabled" =>
+            Compile_Check_Switches :=
+                ("-gnatwa",  -- all warnings
+                 "-gnatVa",  -- all validity checks
+                 "-gnatwe",
+                 "-gnat2020"); -- warnings as errors
+        when others => null;
+    end case;
+
+   Build_Switches := ();
+   case Build_Mode is
+      when "optimize" =>
+         Build_Switches := ("-O2",     -- Optimization
+                            "-gnatn"); -- Enable inlining
+      when "debug" =>
+         Build_Switches := ("-g",   -- Debug info
+                            "-Og"); -- No optimization
+   end case;
+
+    Runtime_Check_Switches := ();
+    case Runtime_Checks is
+        when "enabled" => null;
+        when others => Runtime_Check_Switches := ("-gnatp"); -- suppress checks
+    end case;
+
+    Style_Check_Switches := ();
+    case Style_Checks is
+        when "enabled" => null;
+            Style_Check_Switches :=
+                ("-gnatyg",   -- GNAT Style checks
+                 "-gnaty-d",  -- Disable no DOS line terminators
+                 "-gnatyM80", -- Maximum line length
+                 "-gnatyO");  -- Overriding subprograms explicitly marked as such
+        when others => null;
+   end case;
+
+   Contract_Switches := ();
+   case Contracts_Checks is
+      when "enabled" => null;
+         Contract_Switches :=
+           ("-gnata"); --  Enable assertions and contracts
+      when others =>
+   end case;
+
+    package Compiler is
+        for Default_Switches ("ada") use
+            Compile_Check_Switches &
+            Build_Switches &
+            Runtime_Check_Switches &
+            Style_Check_Switches &
+            Contract_Switches &
+            ("-gnatQ");
+    end Compiler;
+    
+    package Linker is
+        for Default_Switches("ada") use
+           ("./lib/termbox.a",
+           "-Wl,-rpath=./lib");
+    end Linker;
+end Avi;
