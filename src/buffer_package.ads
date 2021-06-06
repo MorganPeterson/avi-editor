@@ -30,4 +30,11 @@ package Buffer_Package is
    procedure Enable_Undo (B : in out Buffer);
 
    procedure Clear_Tag (B : in out Buffer; T : Tag_Type);
+
+   procedure Set_Tag
+      (B  : out Buffer;
+       T  : Tag_Type;
+       P1 : Pos;
+       P2 : Pos;
+       V  : Integer);
 end Buffer_Package;

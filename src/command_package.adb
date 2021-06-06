@@ -1,5 +1,6 @@
 with Ada.Text_IO; use Ada.Text_IO;
 with Buffer_Package; use Buffer_Package;
+with Termbox_Package; use Termbox_Package;
 
 package body Command_Package is
    function Command
@@ -67,5 +68,33 @@ package body Command_Package is
          E.Error := "Could not open file: " & A.S1;
       end if;
    end Cmd_Insert_File;
+
+   function Test_None (V : View) return Boolean is
+   begin
+      if V.BS = NONE or V.BE = NONE then
+         return False;
+      end if;
+      return True;
+   end Test_None;
+
+   procedure Fix_Block (V : in out View) is
+   begin
+      Clear_Tag (V.B, BLOCK);
+      declare
+         TN : Boolean := Test_None (V);
+      begin
+         if TN then
+            if V.BS > V.BE then
+               declare
+                  L : Integer := V.BS;
+               begin
+                  V.BS := V.BE;
+                  V.BE := L;
+               end;
+            end if;
+            Set_Tag (V.B, BLOCK, (V.BS, 0), (V.BE, NONE), TB_REVERSE);
+         end if;
+      end;
+   end Fix_Block;
 
 end Command_Package;

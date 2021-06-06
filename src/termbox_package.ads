@@ -14,6 +14,9 @@ package Termbox_Package is
       TB_OUTPUT_GRAYSCALE,  --  termbox.h:243
       TB_OUTPUT_TRUECOLOR   --  termbox.h:244
       );
+
+   TB_REVERSE : constant := 16#04000000#;
+
    function TB_Init return Integer; -- initialization
 
    procedure TB_Shutdown; -- shutdown

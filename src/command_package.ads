@@ -33,4 +33,8 @@ package Command_Package is
 
    procedure Cmd_Insert_File (E : in out Editor; V : in out View; A : Arg);
 
+   procedure Fix_Block (V : in out View);
+
+private
+   function Test_None (V : View) return Boolean;
 end Command_Package;
